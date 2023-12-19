@@ -1,57 +1,46 @@
-const bodyParser = require('body-parser');
-const express = require('express');
+import express from "express";
+import bodyParser from "body-parser";
+import mongoose from "mongoose";
+import env from "dotenv";
+import cors from "cors";
+
+// Routes
+import userRoutes from "./src/routes/userRouter.js";
+import adminRoutes from "./src/routes/admin/adminRouter.js";
+import itemRoutes from "./src/routes/items.js";
+
+// Environment variables and constants
+env.config();
+
 const app = express();
 
-const dotenv = require("dotenv").config();
-const PORT = process.env.PORT || 4000;
-console.log(`The port env is: ${process.env}`);
-
-const dbConnect = require("./config/dbConnect.js");
-// const { notFound, errorHandler } = require("./middlewares/errorHandler");
-
-const authRouter = require("./routes/authRoute"); // Module that handles the authentication
-// const productRouter = require("./routes/productRoute");
-// const blogRouter = require("./routes/blogRoute");
-// const categoryRouter = require("./routes/prodcategoryRoute");
-// const blogcategoryRouter = require("./routes/blogCatRoute");
-// const brandRouter = require("./routes/brandRoute");
-// const colorRouter = require("./routes/colorRoute");
-// const enqRouter = require("./routes/enqRoute");
-// const couponRouter = require("./routes/couponRoute");
-// const uploadRouter = require("./routes/uploadRoute");
-// const cookieParser = require("cookie-parser");
-const morgan = require("morgan"); // Logging middleware
-// const cors = require("cors");
-
-// To connect to Database
-dbConnect();
-
-//Mount middleware functions
-app.use(morgan("dev"));
-// app.use(cors());
+// Third party middlewares
+app.use(cors({ origin: "http://localhost:3000" }));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-// app.use(cookieParser());
-app.use("/api/user", authRouter);
-// app.use("/api/product", productRouter);
-// app.use("/api/blog", blogRouter);
-// app.use("/api/category", categoryRouter);
-// app.use("/api/blogcategory", blogcategoryRouter);
-// app.use("/api/brand", brandRouter);
-// app.use("/api/coupon", couponRouter);
-// app.use("/api/color", colorRouter);
-// app.use("/api/enquiry", enqRouter);
-// app.use("/api/upload", uploadRouter);
 
-// app.use(notFound);
-// app.use(errorHandler);
+// Route specific middlewares
+app.use("/api", userRoutes);
+app.use("/api", adminRoutes);
+app.use("/api/items", itemRoutes);
 
-app.get("/", (req, res) => {
-  console.log("Request", req.rawHeaders);
-  res.send("Hello from server side");
-}); // TODO: Decide if you want to go with 'get' or 'use'.
-
-app.listen(PORT, () => {
-  console.log(`Server is running  at PORT ${PORT}`);
-  console.log("entering the callback function");
-});
+// Connect MongoDB
+const encodedDBPassword = encodeURIComponent(process.env.MONGO_DB_PASSWORD); // because the password cantain special character '@'
+mongoose
+  .connect(
+    `mongodb+srv://${process.env.MONGO_DB_USER}:${encodedDBPassword}@cluster0.yap1y51.mongodb.net/?retryWrites=true&w=majority`,
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    }
+  )
+  .then(() => {
+    // because it returns promise
+    console.log("Database Connected");
+    // listen for requests
+    app.listen(process.env.PORT, () => {
+      console.log(`Server is running ${process.env.PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.log(error);
+  });
