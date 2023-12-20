@@ -7,7 +7,7 @@ import cors from "cors";
 // Routes
 import userRoutes from "./src/routes/userRouter.js";
 import adminRoutes from "./src/routes/admin/adminRouter.js";
-import itemRoutes from "./src/routes/items.js";
+import itemRoutes from "./src/routes/itemsRouter.js";
 
 // Environment variables and constants
 env.config();
