@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const itemSchema = new mongoose.Schema(
   {
-    title: {
+    name: {
       type: String,
       required: true,
       min: 3,
@@ -22,7 +22,7 @@ const itemSchema = new mongoose.Schema(
       type: String,
       required: true,
       min: 3,
-    },
+    }
   },
   { timestamps: true }
 );

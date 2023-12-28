@@ -24,11 +24,11 @@ const getItem = async (req, res) => {
 
 // create a new item
 const createItem = async (req, res) => {
-  const { title, description, price, category } = req.body;
+  const { name, description, price, category } = req.body;
 
   //add document to db
   try {
-    const item = await Item.create({ title, description, price, category });
+    const item = await Item.create({ name, description, price, category });
     res.status(200).json(item);
   } catch (error) {
     res.status(400).json({ error: error.message });

@@ -9,13 +9,25 @@ import userRoutes from "./src/routes/userRouter.js";
 import adminRoutes from "./src/routes/admin/adminRouter.js";
 import itemRoutes from "./src/routes/itemsRouter.js";
 
+const app = express();
+
 // Environment variables and constants
 env.config();
 
-const app = express();
+// in case of multiple origins
+const allowedOrigins = ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002'];
+const corsOptions = {
+    origin: function (origin, callback) {
+        if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+            callback(null, true)
+        } else {
+            callback(new Error('Not allowed by CORS'))
+        }
+    }
+};
 
 // Third party middlewares
-app.use(cors({ origin: "http://localhost:3000" }));
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
 // Route specific middlewares
