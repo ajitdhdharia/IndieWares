@@ -8,6 +8,7 @@ import cors from "cors";
 import userRoutes from "./src/routes/userRouter.js";
 import adminRoutes from "./src/routes/admin/adminRouter.js";
 import itemRoutes from "./src/routes/itemsRouter.js";
+import instagramRoute from "./src/routes/instagramRoute.js";
 
 const app = express();
 
@@ -15,15 +16,19 @@ const app = express();
 env.config();
 
 // in case of multiple origins
-const allowedOrigins = ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002'];
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "http://localhost:3002",
+];
 const corsOptions = {
-    origin: function (origin, callback) {
-        if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-            callback(null, true)
-        } else {
-            callback(new Error('Not allowed by CORS'))
-        }
+  origin: function (origin, callback) {
+    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
     }
+  },
 };
 
 // Third party middlewares
@@ -34,17 +39,14 @@ app.use(bodyParser.json());
 app.use("/api", userRoutes);
 app.use("/api", adminRoutes);
 app.use("/api/items", itemRoutes);
+app.use("/api/isntagram", instagramRoute);
 
 // Connect MongoDB
-const encodedDBPassword = encodeURIComponent(process.env.MONGO_DB_PASSWORD); // because the password cantain special character '@'
 mongoose
-  .connect(
-    `mongodb+srv://${process.env.MONGO_DB_USER}:${encodedDBPassword}@cluster0.yap1y51.mongodb.net/?retryWrites=true&w=majority`,
-    {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    }
-  )
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => {
     // because it returns promise
     console.log("Database Connected");
