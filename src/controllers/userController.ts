@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import bcrypt from "bcrypt";
 import validator from "validator";
-import User from "../models/userModel";
+import User, { IUser } from "../models/userModel";
 import jwt from "jsonwebtoken";
 import env from "dotenv";
 
@@ -47,9 +47,10 @@ const signUp = async (req: Request, res: Response, next: NextFunction) => {
     // Add salting and hashing to password
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(password, salt);
+    // Save user to database
     const result = await user.save();
+    // Create token
     const token = createToken(user._id);
-    console.log(token);
     res.status(200).json({ result, token });
   } catch (err: any) {
     res.status(400).json({ error: err.message });
@@ -57,6 +58,34 @@ const signUp = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 // Login User
-const signIn = async (req: Request, res: Response) => {};
+const signIn = async (req: Request, res: Response, next: NextFunction) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    throw Error("All fields must be filled");
+  }
+
+  try {
+    const user: IUser | null = await User.findOne({
+      email: email.toLowerCase(),
+    }).select("+password");
+
+    if (!user) {
+      throw Error("User does not exists");
+    }
+
+    const hashedPassword = user.password as string;
+    const match = await bcrypt.compare(password, hashedPassword);
+
+    if (match) {
+      const token = createToken(user._id);
+      res.status(200).json({ user, token });
+    } else {
+      throw Error("Invalid credentials");
+    }
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+};
 
 export { signUp, signIn };
