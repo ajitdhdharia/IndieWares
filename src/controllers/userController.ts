@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import bcrypt from "bcrypt";
 import validator from "validator";
-import User, { IUser } from "../models/userModel";
+import User, { IUser } from "../models/user.model";
 import jwt from "jsonwebtoken";
 import env from "dotenv";
 
