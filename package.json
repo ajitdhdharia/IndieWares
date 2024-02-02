@@ -1,11 +1,11 @@
 {
-  "name": "indieware",
+  "name": "indiewares",
   "version": "1.0.0",
-  "description": "IndieWare web app",
+  "description": "IndieWares web app",
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon src/index.js",
+    "dev": "nodemon -r dotenv/config --experimental-json-modules src/index.js",
     "build": "npm install && tsc"
   },
   "author": "Ajit Dhdharia",

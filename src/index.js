@@ -1,36 +1,24 @@
+import dotenv from "dotenv";
 import express from "express";
 import bodyParser from "body-parser";
-import mongoose from "mongoose";
-import env from "dotenv";
+import connectDB from "./db/index.js";
 
 // Routes
-import userRoutes from "./routes/userRouter";
+// import userRoutes from "./routes/userRouter";
 
 const app = express();
 const port = process.env.PORT || 5000;
 
 // Environment variables and constants
-env.config();
+dotenv.config({
+  path: "./env",
+});
 
-const mongoURI = process.env.MONGO_URI;
+// connect DB
+connectDB();
 
 // Third party middlewares
 app.use(bodyParser.json());
 
 // Route specific middlewares
-app.use("/api/", userRoutes);
-
-// Connect MongoDB
-mongoose
-  .connect(mongoURI)
-  .then(() => {
-    // because it returns promise
-    console.log("Database Connected");
-    // listen for requests
-    app.listen(port, () => {
-      console.log(`Server is running ${port}`);
-    });
-  })
-  .catch((error) => {
-    console.log(error);
-  });
+// app.use("/api/", userRoutes);
