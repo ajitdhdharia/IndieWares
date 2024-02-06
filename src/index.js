@@ -1,13 +1,12 @@
 import dotenv from "dotenv";
-import express from "express";
-import bodyParser from "body-parser";
 import connectDB from "./db/index.js";
+
+const port = process.env.PORT || 5000;
 
 // Routes
 // import userRoutes from "./routes/userRouter";
 
-const app = express();
-const port = process.env.PORT || 5000;
+
 
 // Environment variables and constants
 dotenv.config({
@@ -15,10 +14,20 @@ dotenv.config({
 });
 
 // connect DB
-connectDB();
+connectDB()
+  .then(() => {
+    app.on("error", (err) => {
+      console.log("ERROR: ", err);
+      throw err;
+    });
 
-// Third party middlewares
-app.use(bodyParser.json());
+    app.listen(port, () => {
+      console.log(`Server is running on port ${port}`);
+    });
+  })
+  .catch((error) => {
+    console.log("MONGO DB connection failed !!!", error);
+  });
 
 // Route specific middlewares
 // app.use("/api/", userRoutes);
