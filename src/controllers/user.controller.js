@@ -5,7 +5,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 
 const generateAccessAndRefreshToken = async (userId) => {
   try {
-    const user = await User.findById({ userId });
+    const user = await User.findById(userId);
     const accesToken = user.generateAccessToken();
     const refreshToken = user.generateRefreshToken();
 
@@ -54,8 +54,7 @@ const signUp = asyncHandler(async (req, res, next) => {
     password,
   });
 
-  // check for user creation
-  // remove password and refresh token field from response
+  // remove password and refresh token field from created user
   const createdUser = await User.findById(user._id).select(
     "-password -refreshToken"
   );
@@ -78,8 +77,12 @@ const signIn = asyncHandler(async (req, res, next) => {
   if (!username) {
     throw new ApiError(400, "Username is required");
   }
+
   // User exist or not
-  const user = await User.findOne({ username });
+  const user = await User.findOne({ username: username.toLowerCase() }).select(
+    "+password"
+  ); // as we have 'select: false' in schema
+
   if (!user) {
     throw new ApiError(404, "User does not exist");
   }
@@ -99,6 +102,8 @@ const signIn = asyncHandler(async (req, res, next) => {
   const loggedInUser = await User.findById(user._id).select(
     "-password -refreshToken"
   );
+
+  console.log("LoggedIn user", loggedInUser);
 
   // Sending cookies
   const options = {
