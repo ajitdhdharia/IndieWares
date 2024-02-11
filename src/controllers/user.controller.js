@@ -3,6 +3,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
+import { COOKIES_OPTIONS } from "../constants.js";
 
 const generateAccessAndRefreshToken = async (userId) => {
   try {
@@ -104,16 +105,10 @@ const signIn = asyncHandler(async (req, res, next) => {
     "-password -refreshToken"
   );
 
-  // Sending cookies
-  const options = {
-    httpOnly: true,
-    secure: true,
-  };
-
   return res
     .status(200)
-    .cookie("accessToken", accessToken, options)
-    .cookie("refreshToken", refreshToken, options)
+    .cookie("accessToken", accessToken, COOKIES_OPTIONS)
+    .cookie("refreshToken", refreshToken, COOKIES_OPTIONS)
     .json(
       new ApiResponse(
         200,
@@ -139,15 +134,10 @@ const logoutUser = asyncHandler(async (req, res) => {
     }
   );
 
-  const options = {
-    httpOnly: true,
-    secure: true,
-  };
-
   return res
     .status(200)
-    .clearCookie("accessToken", options)
-    .clearCookie("refreshToken", options)
+    .clearCookie("accessToken", COOKIES_OPTIONS)
+    .clearCookie("refreshToken", COOKIES_OPTIONS)
     .json(new ApiResponse(200, {}, "User logged out successfully"));
 });
 
@@ -176,18 +166,13 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
       throw new ApiError(401, "refresh token is expired or used");
     }
 
-    const options = {
-      httpOnly: true,
-      secure: true,
-    };
-
     const { accessToken, newRefreshToken } =
       await generateAccessAndRefreshToken(user._id);
 
     return res
       .status(200)
-      .cookie("accessToken", accessToken, options)
-      .cookie("refreshToken", newRefreshToken, options)
+      .cookie("accessToken", accessToken, COOKIES_OPTIONS)
+      .cookie("refreshToken", newRefreshToken, COOKIES_OPTIONS)
       .json(
         new ApiResponse(
           200,
